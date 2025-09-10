@@ -1,17 +1,32 @@
 {
   "name": "vapi-voice-agent-demo",
   "version": "1.0.0",
-  "description": "Landing page for Vapi AI voice agent demo for mortgage brokers",
-  "main": "index.html",
+  "description": "React app for Vapi AI voice agent demo for mortgage brokers",
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview"
   },
+  "dependencies": {
+    "@vapi-ai/web": "^1.4.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
   "devDependencies": {
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@vitejs/plugin-react": "^4.0.0",
     "vite": "^5.0.0"
   },
-  "keywords": ["vapi", "ai", "voice-agent", "mortgage", "demo"],
+  "keywords": [
+    "vapi",
+    "ai",
+    "voice-agent",
+    "mortgage",
+    "demo",
+    "react"
+  ],
   "author": "Your Name",
   "license": "MIT"
 }
