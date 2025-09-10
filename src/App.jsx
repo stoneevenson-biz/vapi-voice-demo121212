@@ -2,36 +2,47 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 
 function App() {
-  const [isCallActive, setIsCallActive] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [outboundCall, setOutboundCall] = useState({ active: false, loading: false });
+  const [inboundCall, setInboundCall] = useState({ active: false, loading: false });
   const [error, setError] = useState(null);
-  const [callStatus, setCallStatus] = useState('Ready to start');
   const [vapi, setVapi] = useState(null);
+
+  // Vapi configuration
+  const VAPI_CONFIG = {
+    publicKey: 'b86bc4f5-3cd9-43b3-81f4-99f23c97df90',
+    outboundAssistantId: '7106d8b4-490a-4ad2-99ac-a10318825253',
+    inboundAssistantId: 'c52a419c-9b4b-4e76-83c0-b856ece1e95d'
+  };
 
   useEffect(() => {
     // Load Vapi Web SDK
     const loadVapiSDK = async () => {
       try {
-        // Dynamically import the Vapi Web SDK
         const VapiModule = await import('@vapi-ai/web');
         const Vapi = VapiModule.default;
         
-        // Initialize Vapi with your public key
-        const vapiInstance = new Vapi('b86bc4f5-3cd9-43b3-81f4-99f23c97df90');
+        // Initialize Vapi with public key
+        const vapiInstance = new Vapi(VAPI_CONFIG.publicKey);
         
         // Set up event listeners
-        vapiInstance.on('call-start', () => {
-          console.log('Call started');
-          setIsCallActive(true);
-          setCallStatus('Call active - Click to end');
-          setIsLoading(false);
+        vapiInstance.on('call-start', (call) => {
+          console.log('Call started:', call);
+          // Determine which call type based on assistant ID
+          if (call.assistantId === VAPI_CONFIG.outboundAssistantId) {
+            setOutboundCall(prev => ({ ...prev, active: true, loading: false }));
+          } else if (call.assistantId === VAPI_CONFIG.inboundAssistantId) {
+            setInboundCall(prev => ({ ...prev, active: true, loading: false }));
+          }
         });
 
-        vapiInstance.on('call-end', () => {
-          console.log('Call ended');
-          setIsCallActive(false);
-          setCallStatus('Call ended');
-          setTimeout(() => setCallStatus('Ready to start'), 2000);
+        vapiInstance.on('call-end', (call) => {
+          console.log('Call ended:', call);
+          // Determine which call type based on assistant ID
+          if (call.assistantId === VAPI_CONFIG.outboundAssistantId) {
+            setOutboundCall(prev => ({ ...prev, active: false, loading: false }));
+          } else if (call.assistantId === VAPI_CONFIG.inboundAssistantId) {
+            setInboundCall(prev => ({ ...prev, active: false, loading: false }));
+          }
         });
 
         vapiInstance.on('message', (message) => {
@@ -43,12 +54,11 @@ function App() {
         vapiInstance.on('error', (error) => {
           console.error('Vapi error:', error);
           setError('Voice call error. Please try again.');
-          setIsLoading(false);
-          setCallStatus('Ready to start');
+          setOutboundCall(prev => ({ ...prev, loading: false }));
+          setInboundCall(prev => ({ ...prev, loading: false }));
         });
 
         setVapi(vapiInstance);
-        setCallStatus('Ready to start');
         console.log('Vapi SDK loaded successfully');
       } catch (err) {
         console.error('Failed to load Vapi SDK:', err);
@@ -59,36 +69,62 @@ function App() {
     loadVapiSDK();
   }, []);
 
-  const handleMicClick = () => {
+  const handleOutboundCall = () => {
     if (!vapi) {
       setError('Voice agent not ready. Please wait and try again.');
       return;
     }
 
-    if (isCallActive) {
-      // Stop the call
+    if (outboundCall.active) {
+      // Stop outbound call
       try {
         vapi.stop();
-        setIsCallActive(false);
-        setCallStatus('Call ended');
+        setOutboundCall(prev => ({ ...prev, active: false }));
       } catch (err) {
-        console.error('Error stopping call:', err);
-        setError('Failed to stop voice call.');
+        console.error('Error stopping outbound call:', err);
+        setError('Failed to stop outbound call.');
       }
     } else {
-      // Start the call
-      setIsLoading(true);
+      // Start outbound call
+      setOutboundCall(prev => ({ ...prev, loading: true }));
       setError(null);
-      setCallStatus('Starting call...');
 
       try {
-        // Start voice conversation with your assistant ID
-        vapi.start('8d6f11ee-dd40-4850-b0b3-ff86b5418990');
+        vapi.start(VAPI_CONFIG.outboundAssistantId);
       } catch (err) {
-        console.error('Error starting call:', err);
-        setError('Failed to start voice call. Please try again.');
-        setIsLoading(false);
-        setCallStatus('Ready to start');
+        console.error('Error starting outbound call:', err);
+        setError('Failed to start outbound call. Please try again.');
+        setOutboundCall(prev => ({ ...prev, loading: false }));
+      }
+    }
+  };
+
+  const handleInboundCall = () => {
+    if (!vapi) {
+      setError('Voice agent not ready. Please wait and try again.');
+      return;
+    }
+
+    if (inboundCall.active) {
+      // Stop inbound call
+      try {
+        vapi.stop();
+        setInboundCall(prev => ({ ...prev, active: false }));
+      } catch (err) {
+        console.error('Error stopping inbound call:', err);
+        setError('Failed to stop inbound call.');
+      }
+    } else {
+      // Start inbound call
+      setInboundCall(prev => ({ ...prev, loading: true }));
+      setError(null);
+
+      try {
+        vapi.start(VAPI_CONFIG.inboundAssistantId);
+      } catch (err) {
+        console.error('Error starting inbound call:', err);
+        setError('Failed to start inbound call. Please try again.');
+        setInboundCall(prev => ({ ...prev, loading: false }));
       }
     }
   };
@@ -115,40 +151,78 @@ function App() {
 
         {/* Main Interface */}
         <main className="main-interface">
-          {/* Status Display */}
-          <div className="status-display">
-            <div className={`status-indicator ${isCallActive ? 'active' : ''} ${vapi ? 'ready' : 'loading'}`}>
-              <div className="pulse-ring"></div>
-              <div className="pulse-ring delay-1"></div>
-              <div className="pulse-ring delay-2"></div>
-            </div>
-            <p className="status-text">
-              {!vapi ? 'Loading voice agent...' : callStatus}
-            </p>
-          </div>
-
-          {/* Microphone Button */}
-          <div className="mic-container">
-            <button
-              className={`mic-button ${isCallActive ? 'active' : ''} ${isLoading ? 'loading' : ''} ${!vapi ? 'disabled' : ''}`}
-              onClick={handleMicClick}
-              disabled={isLoading || !vapi}
-              aria-label={isCallActive ? 'End voice call' : 'Start voice call'}
-            >
-              <div className="mic-icon">
-                {!vapi ? '⏳' : isLoading ? '⏳' : isCallActive ? '🔴' : '🎤'}
-              </div>
-              <div className="mic-ripple"></div>
-            </button>
-          </div>
-
           {/* Instructions */}
           <div className="instructions">
             <h2>Experience the Future of Mortgage Brokerage</h2>
             <p>
-              Click the microphone to start a conversation with our AI voice agent. 
-              Ask about mortgage products, rates, or any questions your clients might have.
+              Test both our outbound and inbound AI voice agents. Click the microphones below to start conversations 
+              and experience how our AI can help with mortgage sales and customer support.
             </p>
+          </div>
+
+          {/* Microphone Buttons */}
+          <div className="mic-buttons-container">
+            {/* Outbound Button */}
+            <div className="mic-section">
+              <div className="mic-header">
+                <h3>Outbound Demo</h3>
+                <p>Proactive client outreach</p>
+              </div>
+              <div className="mic-container">
+                <button
+                  className={`mic-button outbound ${outboundCall.active ? 'active' : ''} ${outboundCall.loading ? 'loading' : ''} ${!vapi ? 'disabled' : ''}`}
+                  onClick={handleOutboundCall}
+                  disabled={outboundCall.loading || !vapi}
+                  aria-label={outboundCall.active ? 'End outbound call' : 'Start outbound call'}
+                >
+                  <div className="mic-icon">
+                    {!vapi ? '⏳' : outboundCall.loading ? '⏳' : outboundCall.active ? '🔴' : '📞'}
+                  </div>
+                  <div className="mic-ripple"></div>
+                </button>
+              </div>
+              <div className="status-display">
+                <div className={`status-indicator ${outboundCall.active ? 'active' : ''} ${!vapi ? 'loading' : 'ready'}`}>
+                  <div className="pulse-ring"></div>
+                  <div className="pulse-ring delay-1"></div>
+                  <div className="pulse-ring delay-2"></div>
+                </div>
+                <p className="status-text">
+                  {!vapi ? 'Loading...' : outboundCall.loading ? 'Starting...' : outboundCall.active ? 'Call Active' : 'Ready to Start'}
+                </p>
+              </div>
+            </div>
+
+            {/* Inbound Button */}
+            <div className="mic-section">
+              <div className="mic-header">
+                <h3>Inbound Demo</h3>
+                <p>Customer support & inquiries</p>
+              </div>
+              <div className="mic-container">
+                <button
+                  className={`mic-button inbound ${inboundCall.active ? 'active' : ''} ${inboundCall.loading ? 'loading' : ''} ${!vapi ? 'disabled' : ''}`}
+                  onClick={handleInboundCall}
+                  disabled={inboundCall.loading || !vapi}
+                  aria-label={inboundCall.active ? 'End inbound call' : 'Start inbound call'}
+                >
+                  <div className="mic-icon">
+                    {!vapi ? '⏳' : inboundCall.loading ? '⏳' : inboundCall.active ? '🔴' : '📥'}
+                  </div>
+                  <div className="mic-ripple"></div>
+                </button>
+              </div>
+              <div className="status-display">
+                <div className={`status-indicator ${inboundCall.active ? 'active' : ''} ${!vapi ? 'loading' : 'ready'}`}>
+                  <div className="pulse-ring"></div>
+                  <div className="pulse-ring delay-1"></div>
+                  <div className="pulse-ring delay-2"></div>
+                </div>
+                <p className="status-text">
+                  {!vapi ? 'Loading...' : inboundCall.loading ? 'Starting...' : inboundCall.active ? 'Call Active' : 'Ready to Start'}
+                </p>
+              </div>
+            </div>
           </div>
 
           {/* Features */}
@@ -156,17 +230,17 @@ function App() {
             <div className="feature-card">
               <div className="feature-icon">📞</div>
               <h3>Outbound Calls</h3>
-              <p>Proactive client outreach</p>
+              <p>Proactive client outreach and lead generation for mortgage brokers</p>
             </div>
             <div className="feature-card">
               <div className="feature-icon">📥</div>
               <h3>Inbound Support</h3>
-              <p>Instant client assistance</p>
+              <p>Instant responses to client inquiries and mortgage questions</p>
             </div>
             <div className="feature-card">
               <div className="feature-icon">🏠</div>
               <h3>Mortgage Expertise</h3>
-              <p>Specialized knowledge</p>
+              <p>Specialized knowledge in mortgage products and processes</p>
             </div>
           </div>
         </main>
