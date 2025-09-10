@@ -4,6 +4,7 @@
   "description": "React app for Vapi AI voice agent demo for mortgage brokers",
   "scripts": {
     "dev": "vite",
+    "prebuild": "chmod -R 755 node_modules/.bin",
     "build": "vite build",
     "preview": "vite preview"
   },
