@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vapi AI Voice Agent Demo - Mortgage Brokers</title>
+    <meta name="description" content="Experience our AI voice agent designed specifically for mortgage brokers. Click the mic to start your demo.">
+    
+    <!-- Vapi Widget Script -->
+    <script
+        src="https://unpkg.com/@vapi-ai/client-sdk-react/dist/embed/widget.umd.js"
+        async
+        type="text/javascript">
+    </script>
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎤</text></svg>">
+</head>
+<body>
+    <div class="container">
+        <!-- Header Section -->
+        <header class="header">
+            <div class="logo">
+                <span class="mic-icon">🎤</span>
+                <h1>Vapi AI Voice Agent</h1>
+            </div>
+            <p class="tagline">Powered by AI for Mortgage Brokers</p>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="hero-section">
+                <h2>Experience the Future of Mortgage Brokerage</h2>
+                <p class="description">
+                    Our AI voice agent is specifically designed to help mortgage brokers streamline their workflow, 
+                    answer client questions, and provide instant support. Click the microphone below to start your demo.
+                </p>
+                
+                <!-- Demo Button -->
+                <div class="demo-section">
+                    <button id="startDemo" class="demo-button">
+                        <span class="mic-icon-large">🎤</span>
+                        <span class="button-text">Start Voice Demo</span>
+                    </button>
+                    <p class="demo-instruction">Click the microphone to begin your personalized demo</p>
+                </div>
+            </div>
+
+            <!-- Features Section -->
+            <div class="features-section">
+                <h3>What You'll Experience</h3>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">📞</div>
+                        <h4>Outbound Calls</h4>
+                        <p>See how our agent can make proactive calls to potential clients</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📥</div>
+                        <h4>Inbound Support</h4>
+                        <p>Experience instant responses to client inquiries and questions</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🏠</div>
+                        <h4>Mortgage Expertise</h4>
+                        <p>Specialized knowledge in mortgage products and processes</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>&copy; 2024 Vapi AI Voice Agent Demo. Built for mortgage professionals.</p>
+        </footer>
+    </div>
+
+    <!-- Vapi Widget -->
+    <vapi-widget 
+        assistant-id="8d6f11ee-dd40-4850-b0b3-ff86b5418990" 
+        public-key="b86bc4f5-3cd9-43b3-81f4-99f23c97df90">
+    </vapi-widget>
+
+    <!-- JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>

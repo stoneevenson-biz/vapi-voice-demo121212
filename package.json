@@ -1,0 +1,17 @@
+{
+  "name": "vapi-voice-agent-demo",
+  "version": "1.0.0",
+  "description": "Landing page for Vapi AI voice agent demo for mortgage brokers",
+  "main": "index.html",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  },
+  "keywords": ["vapi", "ai", "voice-agent", "mortgage", "demo"],
+  "author": "Your Name",
+  "license": "MIT"
+}
