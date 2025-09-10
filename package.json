@@ -2,12 +2,10 @@
   "name": "vapi-voice-agent-demo",
   "version": "1.0.0",
   "description": "React app for Vapi AI voice agent demo for mortgage brokers",
-  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview",
-    "vercel-build": "vite build"
+    "preview": "vite preview"
   },
   "dependencies": {
     "@vapi-ai/web": "^1.4.2",
